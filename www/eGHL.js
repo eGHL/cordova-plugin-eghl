@@ -11,6 +11,7 @@ var eGHL = function() {
 eGHL.prototype = {
     makePayment: function(params, success, error)
     {
+        console.log("eGHL-makePayment: " + params);
         argscheck.checkArgs('ofF', 'eGHL.makePayment', arguments);
         exec(
             success,

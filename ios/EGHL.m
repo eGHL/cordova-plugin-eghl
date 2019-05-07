@@ -222,25 +222,30 @@
     [self dismissContentView];
     self.processingInProgress = NO;
 
-    // TODO send some fields e.g. TxnID, AuthCode, etc back to JS
-    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK]
-                          callbackId:[self.command callbackId]];
+    NSDictionary *dict = [self objectAsDictionary:result];
+    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:dict]
+                          callbackId:[command callbackId]];
 }
 
-- (void)endPaymentWithFailureMessage: (NSString*)message
+- (void)endPaymentWithFailureMessage: (PaymentRespPARAM*)result
 {
     [self dismissContentView];
     self.processingInProgress = NO;
-    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:message]
+    
+    NSDictionary *dict = [self objectAsDictionary:result];
+    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:dict]
                           callbackId:[self.command callbackId]];
 }
 
-- (void)endPaymentWithCancellation
+- (void)endPaymentWithCancellation: (PaymentRespPARAM*)result
 {
     [self dismissContentView];
     self.processingInProgress = NO;
     // TMP hard code -999 as cancel payment. (follow android SDK.)
-    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsInt:-999]
+    // NSMutableDictionary *result = [NSMutableDictionary dictionary];
+    // [result setObject: @""  forKey: @""];
+    NSDictionary *dict = [self objectAsDictionary:result];
+    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:dict]
                           callbackId:[self.command callbackId]];
 }
 

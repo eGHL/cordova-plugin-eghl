@@ -154,7 +154,7 @@ necessary (at most one requery before giving up and failing).
         // TxnExists field will be null most of the time (when eGHL SDK is able
         // to grab payment response immediately) and may be non-null when eGHL
         // SDK had to perform a requery.
-        [self.cdvPlugin endPaymentWithFailureMessage:result.TxnMessage];
+        [self.cdvPlugin endPaymentWithFailureMessage:result];
     } else if(!result.TxnExists || [result.TxnExists isEqualToString:@"0"]) {
         // Transaction exists, or SDK returned immediate payment response - in
         // which case we assume transaction exists..
@@ -164,34 +164,34 @@ necessary (at most one requery before giving up and failing).
         } else if([result.TxnStatus isEqualToString:@"1"]) {
             // Transaction failed or cancelled.
             // Check for "buyer cancelled" string in JS
-            [self.cdvPlugin endPaymentWithFailureMessage:result.TxnMessage];
+            [self.cdvPlugin endPaymentWithFailureMessage:result];
         } else if([result.TxnStatus isEqualToString:@"2"]) {
             if(shouldRequery) {
                 // Transaction pending and should requery.
                 [self performRequery];
             } else {
                 // Transaction pending and should NOT requery. Assume user cancelled.
-                [self.cdvPlugin endPaymentWithCancellation];
+                [self.cdvPlugin endPaymentWithCancellation:result];
             }
         } else {
             // Unknown status.
-            [self.cdvPlugin endPaymentWithFailureMessage:result.TxnMessage];
+            [self.cdvPlugin endPaymentWithFailureMessage:result];
         }
     } else if(result.TxnExists) {
         if([result.TxnExists isEqualToString:@"1"]) {
             // Transaction not found in eGHL system. Assume user cancelled.
-            [self.cdvPlugin endPaymentWithCancellation];
+            [self.cdvPlugin endPaymentWithCancellation:result];
         } else if([result.TxnExists isEqualToString:@"2"]) {
             // Failed to query.
             if(shouldRequery) {
                 [self performRequery];
             } else {
-                [self.cdvPlugin endPaymentWithFailureMessage:result.TxnMessage];
+                [self.cdvPlugin endPaymentWithFailureMessage:result];
             }
         }
     } else {
         // Unknown TxnExists value or nil.
-        [self.cdvPlugin endPaymentWithFailureMessage:result.TxnMessage];
+        [self.cdvPlugin endPaymentWithFailureMessage:result];
     }
 }
 
@@ -203,7 +203,10 @@ necessary (at most one requery before giving up and failing).
                       [self processResults:result withRequery:NO];
                   }
                   failedBlock:^(NSString *errorCode, NSString *errorData, NSError *error) {
-                      [self.cdvPlugin endPaymentWithCancellation];
+                    NSMutableDictionary *result = [NSMutableDictionary dictionary];
+                    [result setObject: @"-999"  forKey: @"TxnStatus"];
+                    [result setObject: errorData  forKey: @"TxnMessage"];
+                    [self.cdvPlugin endPaymentWithCancellation:result];
                   }];
 }
 

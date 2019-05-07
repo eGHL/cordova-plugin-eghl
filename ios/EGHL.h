@@ -9,7 +9,7 @@
 - (void)mpeRequest: (CDVInvokedUrlCommand*)command;
 
 - (void)endPaymentSuccessfullyWithResult: (PaymentRespPARAM*)result;
-- (void)endPaymentWithFailureMessage: (NSString*)message;
-- (void)endPaymentWithCancellation;
+- (void)endPaymentWithFailureMessage: (PaymentRespPARAM*)result;
+- (void)endPaymentWithCancellation: (PaymentRespPARAM*)result;
 
 @end

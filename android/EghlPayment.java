@@ -1,4 +1,4 @@
-package my.com.nexstream.cordovaPlugins;
+package com.eghl.cordovaPlugins;
 
 import com.eghl.sdk.params.PaymentParams;
 import com.google.gson.annotations.SerializedName;

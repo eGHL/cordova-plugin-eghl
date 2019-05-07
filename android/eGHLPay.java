@@ -1,10 +1,11 @@
 // This code can only handle one payment at any given moment - no concurrent payments
 // are allowed!
 
-package my.com.nexstream.cordovaPlugins;
+package com.eghl.cordovaPlugins;
 
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CallbackContext;
+import org.json.JSONObject;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -20,7 +21,6 @@ import com.google.gson.Gson;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-
 
 public class eGHLPay extends CordovaPlugin {
 
@@ -45,31 +45,26 @@ public class eGHLPay extends CordovaPlugin {
         if (requestCode == EGHL.REQUEST_PAYMENT) {
             isInProgress = false;
             String message = data.getStringExtra(EGHL.TXN_MESSAGE);
+            String rawResponse = data.getStringExtra(EGHL.RAW_RESPONSE);
+
+            JSONObject jsonObject = new JSONObject();
+
+            try {
+                jsonObject = new JSONObject(rawResponse);
+            } catch(Exception e) {}
+            
             switch (resultCode) {
                 case EGHL.TRANSACTION_SUCCESS:
                     Log.d(TAG, "onActivityResult: payment successful");
-                    cordovaCallbackContext.success(resultCode);
-
+                    cordovaCallbackContext.success(jsonObject);
                     break;
                 case EGHL.TRANSACTION_FAILED:
-                    if(message == null) {
-                        Log.d(TAG, "onActivityResult: payment failure");
-                        cordovaCallbackContext.error(resultCode);
-                    } else {
-                        // Check for "buyer cancelled" string in JS
-                        Log.d(TAG, "onActivityResult: payment failure or cancelled '"+message+"'");
-                        cordovaCallbackContext.error(message);
-                    }
-
+                    Log.d(TAG, "onActivityResult: payment failure");
+                    cordovaCallbackContext.error(jsonObject);
                     break;
                 default:
                     Log.d(TAG, "onActivityResult: " + resultCode);
-                    if(message == null) {
-                        cordovaCallbackContext.error(resultCode);
-                    } else {
-                        cordovaCallbackContext.error(message);
-                    }
-
+                    cordovaCallbackContext.error(jsonObject);
                     break;
             }
         }

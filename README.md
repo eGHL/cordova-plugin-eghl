@@ -40,6 +40,7 @@ eGHL.makePayment(
         * Mandatory payment parameters list:
         * TransactionType, PymtMethod, ServiceID, PaymentID, OrderNumber, PaymentDesc, MerchantReturnURL, Amount, CurrencyCode, CustIp, CustName, CustEmail, CustPhone
         * Check the eGHL documentation for parameter names.
+        */
         
         TransactionType : "SALE"
         PymtMethod : "ANY"

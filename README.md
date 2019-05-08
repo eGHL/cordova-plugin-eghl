@@ -42,31 +42,31 @@ eGHL.makePayment(
         * Check the eGHL documentation for parameter names.
         */
         
-        TransactionType : "SALE"
-        PymtMethod : "ANY"
-        CurrencyCode : "MYR"
+        TransactionType : "SALE",
+        PymtMethod : "ANY",
+        CurrencyCode : "MYR",
 
-        PaymentGateway: "https://..." // Payment gateway URL given by eGHL
-        ServiceID : "abc" //Merchant Code or Service ID given by eGHL
-        Password: "password" // Merchant password given by eGHL
-        MerchantName : "ABC Sdn Bhd"
+        PaymentGateway: "https://...", // Payment gateway URL given by eGHL
+        ServiceID : "abc", //Merchant Code or Service ID given by eGHL
+        Password: "password", // Merchant password given by eGHL
+        MerchantName : "ABC Sdn Bhd",
         
-        PaymentID : "P0000001" // Unique string for each payment
-        OrderNumber : "P0000001" // Order number to refer current payment, can duplicate.
-        PaymentDesc : "eGHL Payment testing"
-        Amount : "123.10" // e.g. 1000.00
+        PaymentID : "P0000001", // Unique string for each payment
+        OrderNumber : "P0000001", // Order number to refer current payment, can duplicate.
+        PaymentDesc : "eGHL Payment testing",
+        Amount : "123.10", // e.g. 1000.00
                        // Invalid format: 1,000.00 or 1000
-        CustName : "Beta Tester"
-        CustEmail : "Tester@mail.com"
-        CustPhone : "60123456789"
+        CustName : "Beta Tester",
+        CustEmail : "Tester@mail.com",
+        CustPhone : "60123456789",
         CustMAC : "",
         CustIP : "",
-        MerchantReturnURL :  "SDK" // redirect when payment complete.
-        MerchantCallBackURL : "https://..." // server to server callback url
-        MerchantApprovalURL : "https://..."
-        MerchantUnApprovalURL : "https://..."
-        LanguageCode : "EN"
-        PageTimeout : "600" // eGHL payment page timeout in seconds
+        MerchantReturnURL :  "SDK", // redirect when payment complete.
+        MerchantCallBackURL : "https://...", // server to server callback url
+        MerchantApprovalURL : "https://...",
+        MerchantUnApprovalURL : "https://...",
+        LanguageCode : "EN",
+        PageTimeout : "600", // eGHL payment page timeout in seconds
         CardHolder : "",
         CardNo : "",
         CardExp : "",
@@ -93,10 +93,10 @@ eGHL.makePayment(
         PromoCode : "",
         
         // SDK exclusive
-        PaymentTimeout : -1 // Android: Force close webview after x seconds
-        sdkTimeout: -1 // iOS: Force close webview after x seconds
-        _finaliseMessage: "Finalising Payment" // iOS only
-        _cancelMessage: "Cancelling Payment" // iOS only
+        PaymentTimeout : -1, // Android: Force close webview after x seconds
+        sdkTimeout: -1, // iOS: Force close webview after x seconds
+        _finaliseMessage: "Finalising Payment", // iOS only
+        _cancelMessage: "Cancelling Payment", // iOS only
         
         // Masterpass exclusive
         ReqToken : "",

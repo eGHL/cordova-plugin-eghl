@@ -1,4 +1,4 @@
-Nexstream eGHL Cordova Plugin
+eGHL Cordova Plugin
 =============================
 
 Cordova Library for integrating with the eGHL payment gateway's mobile SDK.
@@ -8,9 +8,9 @@ Installation
 ------------
 
 ```
-cordova plugin add cordova-plugin-eghl
+cordova plugin add https://github.com/eGHL/cordova-plugin-eghl.git
 ```
-
+> cordova plugin add cordova-plugin-eghl is deprecated
 
 Usage
 -----
@@ -20,7 +20,7 @@ Usage
 To get the version of this plugin at runtime, the following fields are available:
 
 ```javascript
-eGHL.version // e.g. '3.0.5'
+eGHL.version // e.g. '3.2.1'
 eGHL.name // 'eGHL Cordova Plugin'
 ```
 
@@ -38,51 +38,45 @@ eGHL.makePayment(
     {
         /*
         * Mandatory payment parameters list:
-
-        * transactionType, paymentMethod, serviceId, paymentId, orderNumber, paymentDesc,
-        * merchantReturnUrl, amount, currencyCode, custIp, custName, custEmail, custPhone
-
+        * TransactionType, PymtMethod, ServiceID, PaymentID, OrderNumber, PaymentDesc, MerchantReturnURL, Amount, CurrencyCode, CustIp, CustName, CustEmail, CustPhone
         * Check the eGHL documentation for parameter names.
-
-        * [All Field are defined as String], Except paymentTimeout and sdkTimeout.
-
-        * NOTE: Parameter names and spelling follow iOS, wherever the Android and iOS
-        * names differ!
-        */
-
-        // List of accepted params and some value detail (refer docs for more detail):
-        CurrencyCode : "MYR" | ...
-        PymtMethod : "ANY" | "AUTH"
+        
         TransactionType : "SALE"
+        PymtMethod : "ANY"
+        CurrencyCode : "MYR"
 
         PaymentGateway: "https://..." // Payment gateway URL given by eGHL
         ServiceID : "abc" //Merchant Code or Service ID given by eGHL
         Password: "password" // Merchant password given by eGHL
-
+        MerchantName : "ABC Sdn Bhd"
+        
         PaymentID : "P0000001" // Unique string for each payment
         OrderNumber : "P0000001" // Order number to refer current payment, can duplicate.
         PaymentDesc : "eGHL Payment testing"
-        MerchantReturnURL :  "https://*" // redirect when payment complete.
-        Amount : "123.10" // e.g. 1000.00 for IDR
+        Amount : "123.10" // e.g. 1000.00
                        // Invalid format: 1,000.00 or 1000
-        CustIP : "",
         CustName : "Beta Tester"
         CustEmail : "Tester@mail.com"
         CustPhone : "60123456789"
-        B4TaxAmt : "",
-        TaxAmt : "",
-        MerchantName : "ABC Sdn Bhd"
         CustMAC : "",
-        MerchantApprovalURL : "https://*"
-        MerchantUnApprovalURL : "https://*"
-        MerchantCallBackURL : "https://*" // server callback url
-        LanguageCode : "MY" | "EN" | "CN" ...
-        PageTimeout : "780" // timeout in seconds
+        CustIP : "",
+        MerchantReturnURL :  "SDK" // redirect when payment complete.
+        MerchantCallBackURL : "https://..." // server to server callback url
+        MerchantApprovalURL : "https://..."
+        MerchantUnApprovalURL : "https://..."
+        LanguageCode : "EN"
+        PageTimeout : "600" // eGHL payment page timeout in seconds
         CardHolder : "",
         CardNo : "",
         CardExp : "",
         CardCVV2 : "",
         IssuingBank : "",
+        TokenType : "",
+        Token : "",
+        Param6 : "",
+        Param7 : "",
+        B4TaxAmt : "",
+        TaxAmt : "",
         BillAddr : "",
         BillPostal : "",
         BillCity : "",
@@ -94,12 +88,16 @@ eGHL.makePayment(
         ShipRegion : "",
         ShipCountry : "",
         SessionID : "",
-        TokenType : "",
-        Token : "",
-        Param6 : "",
-        Param7 : "",
         EPPMonth : "",
         PromoCode : "",
+        
+        // SDK exclusive
+        PaymentTimeout : -1 // Android: Force close webview after x seconds
+        sdkTimeout: -1 // iOS: Force close webview after x seconds
+        _finaliseMessage: "Finalising Payment" // iOS only
+        _cancelMessage: "Cancelling Payment" // iOS only
+        
+        // Masterpass exclusive
         ReqToken : "",
         PairingToken : "",
         ReqVerifier : "",
@@ -107,26 +105,18 @@ eGHL.makePayment(
         CheckoutResourceURL : "",
         CardId : "",
         PreCheckoutId : "",
-        PaymentTimeout : -1
-        sdkTimeout: 60 // seconds
-        _finaliseMessage: "Optional message for Finalising Payment (iOS Only)"
-        _cancelMessage: "Optional message for Cancelling Payment (iOS Only)"
     },
     function (resp) {
         // Success callback
-        // resp is the resultCode from the Android SDK on Android; undefined on
-        // iOS.
+        // TxnStatus:
+        // 0 - Transaction Successful
     },
     function (err) {
         // Failure callback
-        // err is either a string or `-999` on iOS;
-        // on Android:
-        //     1 = Transaction failed
-        //     2 = Transaction Pending
-        //     -999 = Transaction cancelled
-        //     <other-integer> = The resultCode from eGHL's Android SDK, if a
-        //          message string was not found.
-        //     "an error message" = error message
+        // TxnStatus:
+        // 1 = Transaction Failed
+        // 2 = Transaction Pending
+        // Other = Error
     }
 );
 ```

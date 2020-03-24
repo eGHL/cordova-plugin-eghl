@@ -223,22 +223,6 @@
             [params setValue:paramValue forKey:paramName];
         }
     }
-
-    EGHLPayment *req = [[EGHLPayment alloc] init];
-    [req eGHLMPERequest:params
-         successBlock:^(PaymentRespPARAM *resp) {
-             NSDictionary *dict = [self objectAsDictionary:resp];
-             self.processingInProgress = NO;
-             [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK
-                                                                     messageAsDictionary:dict]
-                                   callbackId:[command callbackId]];
-         }
-         failedBlock:^(NSString *errorCode, NSString *errorData, NSError *error) {
-             self.processingInProgress = NO;
-             [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR
-                                                                     messageAsString:errorData]
-                                   callbackId:[command callbackId]];
-         }];
 }
 
 

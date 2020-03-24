@@ -50,9 +50,8 @@
         </config-file>
 
 
-        <resource-file src="ios/eghl-sdk/guidehandicon.png" />
-        <header-file src="ios/eghl-sdk/EGHLPayment.h" />
-        <source-file src="ios/eghl-sdk/libEGHLPayment.a" framework="true" />
+        <resource-file src="ios/SDK/EGHL.bundle" />
+        <source-file src="ios/SDK/EGHL.framework" target-dir="lib" framework="true"/>
         <header-file src="ios/EGHL.h" />
         <source-file src="ios/EGHL.m" />
         <header-file src="ios/EGHLPayViewController.h" />

@@ -30,7 +30,6 @@ necessary (at most one requery before giving up and failing).
 @implementation EGHLPayViewController
 
 @synthesize paymentParams;
-@synthesize eghlpay;
 @synthesize cdvPlugin;
 @synthesize hasCancelled;
 
@@ -42,19 +41,9 @@ necessary (at most one requery before giving up and failing).
     self = [super init];
     if(self) {
         self.cdvPlugin = cdvPlugin;
-        self.paymentParams = payment;
         self.eghlpay = [[EGHLPayment alloc] init];
-        self.eghlpay.delegate = self;
+        self.paymentParams = payment;
         self.hasCancelled = false;
-
-        NSString *_finaliseMessage = [otherParams objectForKey:@"_finaliseMessage"];
-        if(_finaliseMessage != nil) {
-            self.eghlpay.finaliseMessage = _finaliseMessage;
-        }
-        NSString *_cancelMessage = [otherParams objectForKey:@"_cancelMessage"];
-        if(_cancelMessage != nil) {
-            self.eghlpay.cancelMessage = _cancelMessage;
-        }
     }
     return self;
 }
@@ -67,44 +56,65 @@ necessary (at most one requery before giving up and failing).
     [super viewDidLoad];
 
     // Add cancel button
-    UIBarButtonItem *cancelBtn =
-        [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
-                                 target:self
-                                 action:@selector(cancelPaymentPressed:)];
-    [self.navigationItem setRightBarButtonItem:cancelBtn];
+//    UIBarButtonItem *cancelBtn =
+//        [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
+//                                 target:self
+//                                 action:@selector(cancelPaymentPressed:)];
+//    [self.navigationItem setRightBarButtonItem:cancelBtn];
+//
+//    // Add eGHL view
+//    [self.view addSubview:self.eghlpay];
+//
+//    // Initiate payment process
+//    [self.eghlpay EGHLRequestSale:self.paymentParams
+//                  successBlock:^(NSString *successData) {}
+//                  failedBlock:^(NSString *errorCode, NSString *errorData, NSError *error) {
+//                      if(errorData) {
+//                          UIAlertController *alertView =
+//                              [UIAlertController alertControllerWithTitle:@"Error"
+//                                                 message:errorData
+//                                                 preferredStyle:UIAlertControllerStyleAlert];
+//
+//                          UIAlertAction *actionOk =
+//                              [UIAlertAction actionWithTitle:@"OK"
+//                                             style:UIAlertActionStyleDefault
+//                                             handler:^(UIAlertAction * _Nonnull action) {
+//                                                 // Do nothing, just close this alert.
+//                                             }];
+//
+//                          [alertView addAction:actionOk];
+//
+//                          [self presentViewController:alertView
+//                                animated:YES
+//                                completion:^(void){}];
+//                      }
+//                  } ];
+}
 
-    // Add eGHL view
-    [self.view addSubview:self.eghlpay];
+- (void)displayError:(NSString*) errorData
+{
+    UIAlertController *alertView =
+        [UIAlertController alertControllerWithTitle:@"Error"
+                           message:errorData
+                           preferredStyle:UIAlertControllerStyleAlert];
 
-    // Initiate payment process
-    [self.eghlpay EGHLRequestSale:self.paymentParams
-                  successBlock:^(NSString *successData) {}
-                  failedBlock:^(NSString *errorCode, NSString *errorData, NSError *error) {
-                      if(errorData) {
-                          UIAlertController *alertView =
-                              [UIAlertController alertControllerWithTitle:@"Error"
-                                                 message:errorData
-                                                 preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *actionOk =
+        [UIAlertAction actionWithTitle:@"OK"
+                       style:UIAlertActionStyleDefault
+                       handler:^(UIAlertAction * _Nonnull action) {
+                           // Do nothing, just close this alert.
+                       }];
 
-                          UIAlertAction *actionOk =
-                              [UIAlertAction actionWithTitle:@"OK"
-                                             style:UIAlertActionStyleDefault
-                                             handler:^(UIAlertAction * _Nonnull action) {
-                                                 // Do nothing, just close this alert.
-                                             }];
+    [alertView addAction:actionOk];
 
-                          [alertView addAction:actionOk];
-
-                          [self presentViewController:alertView
-                                animated:YES
-                                completion:^(void){}];
-                      }
-                  } ];
+    [self presentViewController:alertView
+          animated:YES
+          completion:^(void){}];
 }
 
 - (void)viewDidLayoutSubviews{
     [super viewDidLayoutSubviews];
-    self.eghlpay.frame = self.view.frame;
+//    self.eghlpay.frame = self.view.frame;
 }
 
 
@@ -131,7 +141,7 @@ necessary (at most one requery before giving up and failing).
                            handler:^(UIAlertAction * _Nonnull action) {
                               if(!self.hasCancelled) {
                                   self.hasCancelled = true;
-                                  [self.eghlpay finalizeTransaction];
+//                                  [self.eghlpay finalizeTransaction];
                               }
                            }];
 
@@ -168,7 +178,7 @@ necessary (at most one requery before giving up and failing).
         } else if([result.TxnStatus isEqualToString:@"2"]) {
             if(shouldRequery) {
                 // Transaction pending and should requery.
-                [self performRequery];
+//                [self performRequery];
             } else {
                 // Transaction pending and should NOT requery. Assume user cancelled.
                 [self.cdvPlugin endPaymentWithCancellation:result];
@@ -184,7 +194,7 @@ necessary (at most one requery before giving up and failing).
         } else if([result.TxnExists isEqualToString:@"2"]) {
             // Failed to query.
             if(shouldRequery) {
-                [self performRequery];
+//                [self performRequery];
             } else {
                 [self.cdvPlugin endPaymentWithFailureMessage:result];
             }
@@ -195,20 +205,20 @@ necessary (at most one requery before giving up and failing).
     }
 }
 
-- (void)performRequery
-{
-    EGHLPayment *queryEghlpay = [[EGHLPayment alloc] init];
-    [queryEghlpay EGHLRequestQuery:self.paymentParams
-                  successBlock:^(PaymentRespPARAM* result) {
-                      [self processResults:result withRequery:NO];
-                  }
-                  failedBlock:^(NSString *errorCode, NSString *errorData, NSError *error) {
-                    NSMutableDictionary *result = [NSMutableDictionary dictionary];
-                    [result setObject: @"-999"  forKey: @"TxnStatus"];
-                    [result setObject: errorData  forKey: @"TxnMessage"];
-                    [self.cdvPlugin endPaymentWithCancellation:result];
-                  }];
-}
+//- (void)performRequery
+//{
+//    EGHLPayment *queryEghlpay = [[EGHLPayment alloc] init];
+//    [queryEghlpay EGHLRequestQuery:self.paymentParams
+//                  successBlock:^(PaymentRespPARAM* result) {
+//                      [self processResults:result withRequery:NO];
+//                  }
+//                  failedBlock:^(NSString *errorCode, NSString *errorData, NSError *error) {
+//                    NSMutableDictionary *result = [NSMutableDictionary dictionary];
+//                    [result setObject: @"-999"  forKey: @"TxnStatus"];
+//                    [result setObject: errorData  forKey: @"TxnMessage"];
+//                    [self.cdvPlugin endPaymentWithCancellation:result];
+//                  }];
+//}
 
 
 #pragma mark - eGHLDelegate

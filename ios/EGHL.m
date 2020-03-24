@@ -1,7 +1,7 @@
 #import "EGHL.h"
 #import "EGHLPayViewController.h"
 #import <objc/runtime.h>
-
+#import <EGHL/EGHL.h>
 
 #pragma mark - eGHL secret debug fields...
 
@@ -130,13 +130,10 @@
 
     // Get Staging or production environment
     NSString *gatewayUrl = [args objectForKey:@"PaymentGateway"];
-    if([gatewayUrl isEqualToString:@"https://test2pay.ghl.com/IPGSGOM/Payment.aspx"]) {
-        // Special Masterpass development gateway... For TEMPORARY usage only!
-        // TMP FIXME Remove when Masterpass is available in the normal
-        // staging/production gateways.
-        [payParams eghlDebugURL: @"https://test2pay.ghl.com/IPGSGOM/Payment.aspx?"];
-    } else {
-        payParams.realHost = [self isRealHost:gatewayUrl];
+    if([gatewayUrl isEqualToString:@"https://test2pay.ghl.com/IPGSG/Payment.aspx"]) {
+        payParams.settingDict = @{
+            EGHL_DEBUG_PAYMENT_URL: @true,
+        };
     }
 
     payParams.sdkTimeOut = [((NSNumber*) [args objectForKey:@"sdkTimeout"]) doubleValue];
@@ -151,11 +148,44 @@
         [[EGHLPayViewController alloc] initWithEGHLPlugin:self
                                        andPayment:payParams
                                        andOtherParams:args];
-    self.contentViewController = [[UINavigationController alloc] initWithRootViewController:payViewController];
-    self.contentViewController.delegate = self;
-    [self.viewController presentViewController:self.contentViewController
-                         animated:YES
-                         completion:^(void){}];
+//    self.contentViewController = [[UINavigationController alloc] initWithRootViewController:payViewController];
+//    self.contentViewController.delegate = self;
+//    [self.viewController presentViewController:self.contentViewController
+//                         animated:YES
+//                         completion:^(void){}];
+    
+    dispatch_async(dispatch_get_main_queue(), ^ {
+        UIWindow *keyWindow = [[UIApplication sharedApplication] keyWindow];
+
+        UIViewController *vc = keyWindow.rootViewController;
+
+        EGHLPayment * eghlpay = [[EGHLPayment alloc]init];
+        [eghlpay execute:payParams fromViewController:vc successBlock:^(PaymentRespPARAM *responseData) {
+            if(!responseData.TxnStatus) {
+                [self endPaymentWithFailureMessage:responseData];
+            }else if(!responseData.TxnExists || [responseData.TxnExists isEqualToString:@"0"]) {
+                if([responseData.TxnStatus isEqualToString:@"0"]) {
+                    [self endPaymentSuccessfullyWithResult:responseData];
+                }else if([responseData.TxnStatus isEqualToString:@"1"]) {
+                    [self endPaymentWithFailureMessage:responseData];
+                }else if([responseData.TxnStatus isEqualToString:@"2"]) {
+                    [self endPaymentWithCancellation:responseData];
+                }else{
+                    [self endPaymentWithFailureMessage:responseData];
+                }
+            }else if(responseData.TxnExists) {
+                if([responseData.TxnExists isEqualToString:@"1"]) {
+                    [self endPaymentWithCancellation:responseData];
+                } else if([responseData.TxnExists isEqualToString:@"2"]) {
+                    [self endPaymentWithFailureMessage:responseData];
+                }
+            }else {
+                [self endPaymentWithFailureMessage:responseData];
+            }
+        } failedBlock:^(NSString *errorCode, NSString *errorData, NSError *error) {
+            [payViewController displayError:errorData];
+        }];
+    });
 }
 
 - (void)mpeRequest: (CDVInvokedUrlCommand*)command
@@ -179,13 +209,10 @@
 
     // Get Staging or production environment
     NSString *gatewayUrl = [args objectForKey:@"PaymentGateway"];
-    if([gatewayUrl isEqualToString:@"https://test2pay.ghl.com/IPGSGOM/Payment.aspx"]) {
-        // Special Masterpass development gateway... For TEMPORARY usage only!
-        // TMP FIXME Remove when Masterpass is available in the normal
-        // staging/production gateways.
-        [params eghlDebugURL: @"https://test2pay.ghl.com/IPGSGOM/Payment.aspx?"];
-    } else {
-        params.realHost = [self isRealHost:gatewayUrl];
+    if([gatewayUrl isEqualToString:@"https://test2pay.ghl.com/IPGSG/Payment.aspx"]) {
+        params.settingDict = @{
+            EGHL_DEBUG_PAYMENT_URL: @true,
+        };
     }
 
     // Get other params from command arguments.
@@ -265,10 +292,6 @@
                          completion:^(void){}];
 }
 
-- (Boolean)isRealHost: (NSString*)gateway
-{
-    return ![gateway isEqualToString:@"https://test2pay.ghl.com/IPGSG/Payment.aspx"];
-}
 
 // Get all non-nil fields in an NSObject and returns them in an NSDictionary.
 // http://stackoverflow.com/a/31181746

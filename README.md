@@ -12,6 +12,8 @@ cordova plugin add https://github.com/eGHL/cordova-plugin-eghl.git
 ```
 > cordova plugin add cordova-plugin-eghl is deprecated
 
+Refer [here](https://github.com/eGHL/cordova-plugin-eghl/wiki/iOS-V2-Linking-Libraries) on how to link to eGHL v2 SDK
+
 Usage
 -----
 

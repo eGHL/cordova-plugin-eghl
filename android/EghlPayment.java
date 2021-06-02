@@ -28,6 +28,8 @@ public class EghlPayment {
     private String currencyCode = "";
     @SerializedName("PymtMethod")
     private String paymentMethod = "";
+    @SerializedName("PaymentType")
+    private String paymentType = "";
     @SerializedName("TransactionType")
     private String transactionType = "";
     @SerializedName("PaymentGateway")
@@ -48,6 +50,8 @@ public class EghlPayment {
     private String amount = "";
     @SerializedName("CustIP")
     private String custIp = "";
+    @SerializedName("CustID")
+    private String custId = "";
     @SerializedName("CustName")
     private String custName = "";
     @SerializedName("CustEmail")
@@ -145,6 +149,14 @@ public class EghlPayment {
         this.custIp = custIp;
     }
 
+    public String getCustId() {
+        return custId;
+    }
+
+    public void setCustId(String custId) {
+        this.custId = custId;
+    }
+
     public String getCurrencyCode() {
         return currencyCode;
     }
@@ -159,6 +171,14 @@ public class EghlPayment {
 
     public void setPaymentMethod(String paymentMethod) {
         this.paymentMethod = paymentMethod;
+    }
+
+    public String getPaymentType() {
+        return paymentType;
+    }
+
+    public void setPaymentType(String paymentType) {
+        this.paymentType = paymentType;
     }
 
     public String getTransactionType() {
